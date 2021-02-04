@@ -1,2 +1,2 @@
 # Estudos de Analise
- Testes de analise
+ Testes de analise de amostras
