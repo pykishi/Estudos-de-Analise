@@ -177,3 +177,43 @@ table(autos$kmd)
 boxplot(autos$weight~autos$kmd, main= 'Weight', col=topo.colors(5))
 
 cluster.stats(drivers.dist, autos$hcl, autos$kmd)$corrected.rand
+
+#3.b
+produtos <- read_excel("Produtos.xlsx")
+produtos <- produtos[,-1]
+prod.mat=as.matrix(produtos) 
+class(prod.mat)
+prod.tr=as(prod.mat,"transactions")
+
+#analisando os produtos graficamente
+itemFrequency(prod.tr) # suporte de cada item 
+itemFrequencyPlot(prod.tr, col=topo.colors(2)) #não ordena
+itemFrequencyPlot(prod.tr,topN=10, main="item support",ylim=c(0,.8), col=topo.colors(10));grid(col=3)
+abline(h=.2,col=2, lwd=3)  #suporte mínimo de 10%, por exemplo
+
+rules=apriori(data = prod.tr, parameter = list(supp=0.2,conf=0.8, 
+                                              minlen=2, maxlen=4, target="rules" ))
+rules
+
+#3.c
+inspect(sort(rules, by="conf"))
+
+#3.d
+inspect(rules[is.redundant(rules)]) # output em branco se nao houver regras redundantes
+rules.pruned=rules[!is.redundant(rules, measure="confidence")]
+rules.pruned
+inspect(sort(rules.pruned, by="conf"))
+
+#3.e
+rules.child=apriori(data = prod.tr, 
+                    parameter = list(supp=0.2,conf=0.6, minlen=2, maxlen=4,  target="rules"), 
+                    appearance = list(rhs="B"))
+rules.child
+
+inspect(sort(rules.child, by="confidence"))
+
+inspect(rules.child[is.redundant(rules.child)]) 
+rules.kids=rules.child[!is.redundant(rules.child)] 
+rules.kids
+
+
